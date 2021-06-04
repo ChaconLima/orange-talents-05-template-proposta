@@ -8,11 +8,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 import br.com.mateuschacon.proposta.Configuration.Validation.Custom.CpfOrCnpj;
+import br.com.mateuschacon.proposta.Configuration.Validation.Custom.UniqueValue;
 import br.com.mateuschacon.proposta.ProposedResource.Models.Proposed;
 
 public class NewProposalRequest {
     
-    @NotBlank @CpfOrCnpj
+    @NotBlank @CpfOrCnpj @UniqueValue(domainClass = Proposed.class, fieldName = "document")
     private String document;
 
     @NotBlank @Email
