@@ -11,7 +11,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 
-import br.com.mateuschacon.proposta.Configuration.Exceptions.UnprocessableEntity;
+import br.com.mateuschacon.proposta.Configuration.Validation.Exceptions.UnprocessableEntity;
 
 public class UniqueValueValidator implements ConstraintValidator<UniqueValue, Object>{
 

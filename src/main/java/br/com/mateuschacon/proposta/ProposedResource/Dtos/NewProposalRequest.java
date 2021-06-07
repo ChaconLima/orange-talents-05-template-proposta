@@ -1,6 +1,7 @@
 package br.com.mateuschacon.proposta.ProposedResource.Dtos;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -9,6 +10,7 @@ import javax.validation.constraints.Positive;
 
 import br.com.mateuschacon.proposta.Configuration.Validation.Custom.CpfOrCnpj;
 import br.com.mateuschacon.proposta.Configuration.Validation.Custom.UniqueValue;
+import br.com.mateuschacon.proposta.ProposedResource.Models.ProposalStatusEnum;
 import br.com.mateuschacon.proposta.ProposedResource.Models.Proposed;
 
 public class NewProposalRequest {
@@ -28,6 +30,9 @@ public class NewProposalRequest {
     @NotNull @Positive
     private BigDecimal wage;
 
+    @NotNull 
+    private String id;
+
     public NewProposalRequest(@NotBlank String document, @NotBlank String email, @NotBlank String name,
             @NotBlank String address,  @Positive @NotNull BigDecimal wage) {
         this.document = document;
@@ -35,17 +40,32 @@ public class NewProposalRequest {
         this.name = name;
         this.address = address;
         this.wage = wage;
+        this.id = UUID.randomUUID().toString().replace("-", "");
     }
 
-    public Proposed toModel(){
+    public Proposed toModel( FinancialAssessmentResponse fResponse){
+        
+        ProposalStatusEnum statusProposal = 
+            ProposalStatusEnum.getProposalStatusEnumByValue( fResponse.getResultadoSolicitacao() );
+
         return 
             new Proposed(
+                    this.id,
                     this.document, 
                     this.email, 
                     this.name, 
                     this.address, 
-                    this.wage
+                    this.wage,
+                    statusProposal
                 );
     }
 
+    public FinancialAssessmentRequest toRequest() {
+        return 
+            new FinancialAssessmentRequest(
+                this.document,
+                this.name,
+                this.id
+            );
+    }
 }

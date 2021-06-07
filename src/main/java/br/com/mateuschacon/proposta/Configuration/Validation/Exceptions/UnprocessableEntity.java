@@ -1,4 +1,4 @@
-package br.com.mateuschacon.proposta.Configuration.Exceptions;
+package br.com.mateuschacon.proposta.Configuration.Validation.Exceptions;
 
 import org.springframework.http.HttpStatus;
 

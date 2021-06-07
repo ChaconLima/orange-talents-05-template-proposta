@@ -4,20 +4,18 @@ import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 public class Proposed {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "id", columnDefinition = "VARCHAR(36)")
+    @Column(name = "id", columnDefinition = "VARCHAR(32)")
+    @NotBlank
     private String id;
 
     @NotBlank
@@ -35,17 +33,24 @@ public class Proposed {
     @NotNull
     private BigDecimal wage;
 
+    @NotNull @Enumerated(EnumType.STRING)
+    private ProposalStatusEnum proposalStatusEnum;
+
+    
     @Deprecated
     Proposed(){}
 
-    public Proposed(@NotBlank String document, @NotBlank String email, @NotBlank String name, @NotBlank String address,
-            @NotNull BigDecimal wage) {
+    public Proposed(@NotBlank String id, @NotBlank String document, @NotBlank String email, @NotBlank String name,
+            @NotBlank String address, @NotNull BigDecimal wage, @NotNull ProposalStatusEnum proposalStatusEnum) {
+        this.id = id;
         this.document = document;
         this.email = email;
         this.name = name;
         this.address = address;
         this.wage = wage;
+        this.proposalStatusEnum = proposalStatusEnum;
     }
+
     public String getId() {
         return this.id;
     }
