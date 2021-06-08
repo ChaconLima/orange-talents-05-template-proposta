@@ -10,8 +10,8 @@ import javax.validation.constraints.Positive;
 
 import br.com.mateuschacon.proposta.Configuration.Validation.Custom.CpfOrCnpj;
 import br.com.mateuschacon.proposta.Configuration.Validation.Custom.UniqueValue;
-import br.com.mateuschacon.proposta.ProposedResource.Models.ProposalStatusEnum;
 import br.com.mateuschacon.proposta.ProposedResource.Models.Proposed;
+import br.com.mateuschacon.proposta.ProposedResource.Models.Enums.ProposalStatusEnum;
 
 public class NewProposalRequest {
     

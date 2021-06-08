@@ -1,4 +1,4 @@
-package br.com.mateuschacon.proposta.ProposedResource.Models;
+package br.com.mateuschacon.proposta.ProposedResource.Models.Enums;
 
 import java.util.HashMap;
 import java.util.Map;

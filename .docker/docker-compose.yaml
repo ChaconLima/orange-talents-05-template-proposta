@@ -25,7 +25,8 @@ services:
   postgres:
     image: 'postgres:alpine'
     volumes:
-      - postgres-volume:/var/lib/postgresql/data
+      - C:\Users\mateus.lima\Desktop\Desenvolvimento\orange-talents-05-template-proposta\.docker\volumes\postgres-volume:/var/lib/postgresql/data
+      #- postgres-volume:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment:
@@ -110,7 +111,8 @@ services:
   prometheus:
     image: prom/prometheus
     volumes:
-     - prometheus-volume:/etc/prometheus/
+      - C:\Users\mateus.lima\Desktop\Desenvolvimento\orange-talents-05-template-proposta\.docker\volumes\prometheus-volume:/etc/prometheus/
+     #- prometheus-volume:/etc/prometheus/
     network_mode: bridge
     ports:
       - "9090:9090"
@@ -118,7 +120,8 @@ services:
   grafana:
     image: grafana/grafana
     volumes:
-      - grafana-volume:/var/lib/grafana
+      - C:\Users\mateus.lima\Desktop\Desenvolvimento\orange-talents-05-template-proposta\.docker\volumes\grafana-volume:/var/lib/grafana
+      #- grafana-volume:/var/lib/grafana
     network_mode: bridge
     ports:
       - "3000:3000"
