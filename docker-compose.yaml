@@ -1,6 +1,5 @@
 version: '3'
 services:
-
   zookeeper:
     image: "confluentinc/cp-zookeeper:5.2.1"
     environment:
@@ -25,8 +24,7 @@ services:
   postgres:
     image: 'postgres:alpine'
     volumes:
-      - C:\Users\mateus.lima\Desktop\Desenvolvimento\orange-talents-05-template-proposta\.docker\volumes\postgres-volume:/var/lib/postgresql/data
-      #- postgres-volume:/var/lib/postgresql/data
+      - postgres-volume:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment:
@@ -111,8 +109,7 @@ services:
   prometheus:
     image: prom/prometheus
     volumes:
-      - C:\Users\mateus.lima\Desktop\Desenvolvimento\orange-talents-05-template-proposta\.docker\volumes\prometheus-volume:/etc/prometheus/
-     #- prometheus-volume:/etc/prometheus/
+      - prometheus-volume:/etc/prometheus/
     network_mode: bridge
     ports:
       - "9090:9090"
@@ -120,8 +117,7 @@ services:
   grafana:
     image: grafana/grafana
     volumes:
-      - C:\Users\mateus.lima\Desktop\Desenvolvimento\orange-talents-05-template-proposta\.docker\volumes\grafana-volume:/var/lib/grafana
-      #- grafana-volume:/var/lib/grafana
+      - grafana-volume:/var/lib/grafana
     network_mode: bridge
     ports:
       - "3000:3000"
@@ -137,7 +133,50 @@ services:
       VAULT_TOKEN: ee413645-dbe8-4848-afc6-6bb2768ada75
       VAULT_ADDR: http://127.0.0.1:8200
 
+  mysql:
+    image: mysql:8.0.25
+    restart: always
+    volumes:
+      - mysql-volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: "container_proposta"
+      MYSQL_USER: "user_proposta"
+      MYSQL_PASSWORD: "proposta123mysql"
+      MYSQL_ROOT_PASSWORD: "proposta123mysql"
+    ports:
+      - 3308:3306
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+  
+  proposta:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    container_name: proposta
+    environment:
+      APP_PORT: "8821"
+      HOST_API_ANALISE: "http://analise:9999/api"
+      HOST_API_CONTAS: "http://contas:8888/api"
+      CONTAINER_DATABASE_URL: "jdbc:mysql://mysql:3306/container_proposta?allowPublicKeyRetrieval=true&useSSL=false"
+      CONTAINER_DATABASE_USERNAME: "user_proposta"
+      CONTAINER_DATABASE_PASSWORD: "proposta123mysql"
+  
+    depends_on: 
+      - analise
+      - contas
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    ports:
+      - 8080:8821
+  
 volumes:
+  mysql-volume:
   grafana-volume:
   prometheus-volume:
   postgres-volume:

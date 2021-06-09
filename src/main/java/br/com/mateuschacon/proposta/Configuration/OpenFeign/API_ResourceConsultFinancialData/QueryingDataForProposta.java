@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import br.com.mateuschacon.proposta.ProposedResource.Dtos.FinancialAssessmentRequest;
 import br.com.mateuschacon.proposta.ProposedResource.Dtos.FinancialAssessmentResponse;
 
-@FeignClient(name = "querying-applicant-data" , url = "http://localhost:9999/api", configuration = FeignClientConfiguration.class)
+@FeignClient(name = "querying-applicant-data" , url = "${analise}", configuration = FeignClientConfiguration.class)
 public interface QueryingDataForProposta {
     
     @RequestMapping(method = RequestMethod.POST, value = "/solicitacao", consumes = "application/json")

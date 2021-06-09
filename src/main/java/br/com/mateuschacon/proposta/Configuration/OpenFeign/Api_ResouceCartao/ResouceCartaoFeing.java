@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import br.com.mateuschacon.proposta.ProposedResource.Dtos.CardAssociationResponse;
 
-@FeignClient(name = "card-resource" , url = "http://localhost:8888/api")
+@FeignClient(name = "card-resource" , url = "${contas}")
 public interface ResouceCartaoFeing {
     
     @GetMapping(value = "cartoes?idProposta={id}")
