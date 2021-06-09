@@ -14,6 +14,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import br.com.mateuschacon.proposta.ProposedResource.Dtos.CardAssociationResponse;
+import br.com.mateuschacon.proposta.ProposedResource.Dtos.ProposedResponse;
 import br.com.mateuschacon.proposta.ProposedResource.Models.Enums.AssociationStatusEnum;
 import br.com.mateuschacon.proposta.ProposedResource.Models.Enums.ProposalStatusEnum;
 
@@ -68,6 +69,10 @@ public class Proposed {
     public void cardAssociation(@Valid CardAssociationResponse cardAssociationResponse){
         this.card = cardAssociationResponse.toModel();
         this.associationStatusEnum = AssociationStatusEnum.FEITO;
+    }
+    
+    public ProposedResponse toRequest(){
+        return new ProposedResponse(this.proposalStatusEnum);
     }
 
     public String getId() {
