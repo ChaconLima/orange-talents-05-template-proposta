@@ -13,6 +13,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import br.com.mateuschacon.proposta.CardResource.Models.Card;
 import br.com.mateuschacon.proposta.ProposedResource.Dtos.CardAssociationResponse;
 import br.com.mateuschacon.proposta.ProposedResource.Dtos.ProposedResponse;
 import br.com.mateuschacon.proposta.ProposedResource.Models.Enums.AssociationStatusEnum;
@@ -47,7 +48,7 @@ public class Proposed {
     @NotNull @Enumerated(EnumType.STRING)
     private AssociationStatusEnum associationStatusEnum;
 
-    @OneToOne (cascade = CascadeType.ALL)
+    @OneToOne (cascade = CascadeType.MERGE)
     private Card card;
 
     

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import br.com.mateuschacon.proposta.ProposedResource.Models.Card;
+import br.com.mateuschacon.proposta.CardResource.Models.Card;
 
 public class CardAssociationResponse {
     
