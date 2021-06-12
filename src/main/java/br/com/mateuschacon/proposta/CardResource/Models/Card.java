@@ -8,8 +8,11 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -30,6 +33,10 @@ public class Card {
     @OneToMany(mappedBy = "card", cascade = CascadeType.MERGE)
     private Set<Biometry>biometrics;
 
+    @OneToOne(mappedBy = "card", cascade = CascadeType.MERGE, fetch = FetchType.LAZY )
+    @JoinColumn(name = "block")
+    private Block block;
+
     @Deprecated
     public Card(){}
 
@@ -40,8 +47,18 @@ public class Card {
         this.biometrics = new HashSet<>();
     }
 
+    public boolean isNotBlocked(){
+        if(this.block == null){
+            return true;
+        }
+        return false;
+    }
+
     public void addBiometry( Biometry biometry){
         this.biometrics.add(biometry);
+    }
+    public void addBlock(Block block){
+        this.block = block;
     }
     public Set<Biometry> getBiometrics() {
         return this.biometrics;
