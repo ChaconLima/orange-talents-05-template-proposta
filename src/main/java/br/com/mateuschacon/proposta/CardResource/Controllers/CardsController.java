@@ -16,11 +16,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import br.com.mateuschacon.proposta.CardResource.Dtos.BlockRequest;
+import br.com.mateuschacon.proposta.CardResource.Dtos.BlockResponse;
 import br.com.mateuschacon.proposta.CardResource.Dtos.NewBiometryRequest;
 import br.com.mateuschacon.proposta.CardResource.Models.Biometry;
 import br.com.mateuschacon.proposta.CardResource.Models.Block;
 import br.com.mateuschacon.proposta.CardResource.Models.Card;
 import br.com.mateuschacon.proposta.CardResource.Repositorys.CardRepository;
+import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.BlackCardException;
+import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.ResouceCartaoFeing;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,6 +70,12 @@ public class CardsController {
     @Autowired
     private HttpServletRequest request;
 
+    /**
+     * Feign.
+     */
+    @Autowired
+    private ResouceCartaoFeing resouceCartaoFeing;
+
     @GetMapping(value="/{id}/block")
     public ResponseEntity<?> blockRegistration(
 
@@ -86,7 +96,19 @@ public class CardsController {
             String userAgent = request.getHeader("User-Agent");
             String ip = request.getRemoteAddr();
     
-            Block block = new Block(ip, userAgent, card);
+            BlockResponse blockResponse;
+            try {
+
+                blockResponse = this.resouceCartaoFeing.blockCard( id_card, new BlockRequest("Sistema de Proposta"));
+        
+            }catch(BlackCardException e) {
+                
+                blockResponse = e.getBlockResponse();
+            }
+
+
+            Block block = new Block(ip, userAgent, card, blockResponse);
+           
             card.addBlock(block);
 
             this.cardRepository.save(card);
