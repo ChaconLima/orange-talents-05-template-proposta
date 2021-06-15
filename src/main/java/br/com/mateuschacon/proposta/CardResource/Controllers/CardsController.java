@@ -19,9 +19,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import br.com.mateuschacon.proposta.CardResource.Dtos.BlockRequest;
 import br.com.mateuschacon.proposta.CardResource.Dtos.BlockResponse;
 import br.com.mateuschacon.proposta.CardResource.Dtos.NewBiometryRequest;
+import br.com.mateuschacon.proposta.CardResource.Dtos.NewTravelNoticeRequest;
 import br.com.mateuschacon.proposta.CardResource.Models.Biometry;
 import br.com.mateuschacon.proposta.CardResource.Models.Block;
 import br.com.mateuschacon.proposta.CardResource.Models.Card;
+import br.com.mateuschacon.proposta.CardResource.Models.Travel;
 import br.com.mateuschacon.proposta.CardResource.Repositorys.CardRepository;
 import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.BlackCardException;
 import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.ResouceCartaoFeing;
@@ -119,5 +121,36 @@ public class CardsController {
 
         return ResponseEntity.status( HttpStatus.UNPROCESSABLE_ENTITY).build();
     }
+
+    /**
+     * 
+     * 
+     */
+    @PostMapping(value="/{id}/travel")
+    public ResponseEntity<?> travelRegistration(
+
+        @PathVariable("id") String id_card,
+        @RequestBody @Valid NewTravelNoticeRequest newTravelNoticeRequest
+
+    ){
+
+        Optional<Card> cardIsValid = this.cardRepository.findById(id_card);
+
+        if( cardIsValid.isPresent() ){
+
+            Card card = cardIsValid.get();
+            Travel travel = newTravelNoticeRequest.toModel(card, this.request);
+
+            card.addTravel(travel);
+
+            this.cardRepository.save(card);
+
+            return ResponseEntity.ok().build();
+
+
+        }
+        return ResponseEntity.notFound().build();
+    }
+    
     
 }

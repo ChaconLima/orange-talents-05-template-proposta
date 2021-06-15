@@ -37,6 +37,9 @@ public class Card {
     @JoinColumn(name = "block")
     private Block block;
 
+    @OneToMany(mappedBy = "card", cascade = CascadeType.MERGE)
+    private Set<Travel> travels;
+
     @Deprecated
     public Card(){}
 
@@ -45,6 +48,7 @@ public class Card {
         this.issued = issued;
         this.limitCard = limitCard;
         this.biometrics = new HashSet<>();
+        this.travels = new HashSet<>();
     }
 
     public boolean isNotBlocked(){
@@ -56,6 +60,9 @@ public class Card {
 
     public void addBiometry( Biometry biometry){
         this.biometrics.add(biometry);
+    }
+    public void addTravel( Travel travel){
+        this.travels.add(travel);
     }
     public void addBlock(Block block){
         this.block = block;
