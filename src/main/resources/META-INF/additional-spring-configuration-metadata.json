@@ -18,5 +18,10 @@
     "name": "server.host",
     "type": "java.lang.String",
     "description": "A description for 'server.host'"
+  },
+  {
+    "name": "management.endpoints.prometheus.enabled",
+    "type": "java.lang.String",
+    "description": "A description for 'management.endpoints.prometheus.enabled'"
   }
 ]}
