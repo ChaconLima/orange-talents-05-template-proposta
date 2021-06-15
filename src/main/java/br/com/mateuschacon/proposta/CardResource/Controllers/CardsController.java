@@ -20,12 +20,13 @@ import br.com.mateuschacon.proposta.CardResource.Dtos.BlockRequest;
 import br.com.mateuschacon.proposta.CardResource.Dtos.BlockResponse;
 import br.com.mateuschacon.proposta.CardResource.Dtos.NewBiometryRequest;
 import br.com.mateuschacon.proposta.CardResource.Dtos.NewTravelNoticeRequest;
+import br.com.mateuschacon.proposta.CardResource.Dtos.TravelNoticeResponse;
 import br.com.mateuschacon.proposta.CardResource.Models.Biometry;
 import br.com.mateuschacon.proposta.CardResource.Models.Block;
 import br.com.mateuschacon.proposta.CardResource.Models.Card;
 import br.com.mateuschacon.proposta.CardResource.Models.Travel;
 import br.com.mateuschacon.proposta.CardResource.Repositorys.CardRepository;
-import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.BlackCardException;
+import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.ResouceCartaoException;
 import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.ResouceCartaoFeing;
 
 import org.springframework.web.bind.annotation.RequestBody;
@@ -103,7 +104,7 @@ public class CardsController {
 
                 blockResponse = this.resouceCartaoFeing.blockCard( id_card, new BlockRequest("Sistema de Proposta"));
         
-            }catch(BlackCardException e) {
+            }catch(ResouceCartaoException e) {
                 
                 blockResponse = e.getBlockResponse();
             }
@@ -136,20 +137,35 @@ public class CardsController {
 
         Optional<Card> cardIsValid = this.cardRepository.findById(id_card);
 
-        if( cardIsValid.isPresent() ){
+        if( !cardIsValid.isPresent() ){
+            return ResponseEntity.notFound().build();
+        }
 
-            Card card = cardIsValid.get();
+        TravelNoticeResponse fResponse;
+        try {
+
+            fResponse =  this.resouceCartaoFeing.travelNotice(id_card, newTravelNoticeRequest);
+    
+        }catch(ResouceCartaoException e) {
+
+            fResponse = e.getTravelNoticeResponse();
+
+        }
+        
+        Card card = cardIsValid.get();
+        if(card.isValidTravelNotice(fResponse)){
+
             Travel travel = newTravelNoticeRequest.toModel(card, this.request);
 
             card.addTravel(travel);
 
             this.cardRepository.save(card);
 
-            return ResponseEntity.ok().build();
-
-
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().build();
+        
+
+     
     }
     
     

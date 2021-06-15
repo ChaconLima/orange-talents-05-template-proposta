@@ -8,7 +8,7 @@ public class ResouceCartaoConfiguration {
 
     @Bean
     public ErrorDecoder errorDecoder() {
-        return new BlackCardError();
+        return new ResouceCartaoError();
     }
     
 }

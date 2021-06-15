@@ -16,6 +16,8 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import br.com.mateuschacon.proposta.CardResource.Dtos.TravelNoticeResponse;
+
 @Entity
 public class Card {
     
@@ -53,6 +55,14 @@ public class Card {
 
     public boolean isNotBlocked(){
         if(this.block == null){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isValidTravelNotice(TravelNoticeResponse fResponse){
+
+        if(fResponse.getResultado().equals("CRIADO")){
             return true;
         }
         return false;

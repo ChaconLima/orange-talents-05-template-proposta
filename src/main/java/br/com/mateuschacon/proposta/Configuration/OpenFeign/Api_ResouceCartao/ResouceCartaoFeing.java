@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import br.com.mateuschacon.proposta.CardResource.Dtos.BlockRequest;
 import br.com.mateuschacon.proposta.CardResource.Dtos.BlockResponse;
+import br.com.mateuschacon.proposta.CardResource.Dtos.NewTravelNoticeRequest;
+import br.com.mateuschacon.proposta.CardResource.Dtos.TravelNoticeResponse;
 import br.com.mateuschacon.proposta.ProposedResource.Dtos.CardAssociationResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +24,14 @@ public interface ResouceCartaoFeing {
 
         @PathVariable("id") String id_proposed,
         @RequestBody BlockRequest entity
+        
+    );
+
+    @PostMapping(value = "cartoes/{id}/avisos")
+    TravelNoticeResponse travelNotice(
+
+        @PathVariable("id") String id_proposed,
+        @RequestBody NewTravelNoticeRequest entity
         
     );
     

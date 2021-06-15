@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import br.com.mateuschacon.proposta.CardResource.Models.Card;
@@ -18,19 +19,19 @@ public class NewTravelNoticeRequest {
     /**
      *
      */
-    private static final String DD_MM_YYYY = "dd/MM/yyyy";
+    private static final String DD_MM_YYYY = "yyyy-MM-dd";
 
-    @NotBlank
-    private String destination;
+    @NotBlank @JsonProperty
+    private String destino;
 
-    @NotNull @Future @JsonFormat(pattern = NewTravelNoticeRequest.DD_MM_YYYY, shape = Shape.STRING)
-    private LocalDate returnDate;
+    @NotNull @Future @JsonFormat(pattern = NewTravelNoticeRequest.DD_MM_YYYY, shape = Shape.STRING) @JsonProperty
+    private LocalDate validoAte;
 
     public void setDestination(@NotBlank String destination) {
-        this.destination = destination;
+        this.destino = destination;
     }
     public void setReturnDate( @NotNull LocalDate returnDate) {
-        this.returnDate = returnDate;
+        this.validoAte = returnDate;
     }
 
     public Travel toModel(Card card, HttpServletRequest request){
@@ -38,7 +39,7 @@ public class NewTravelNoticeRequest {
         String userAgent = request.getHeader("User-Agent");
         String ip = request.getRemoteAddr();
 
-        return new Travel(this.destination, this.returnDate, ip, userAgent, card);
+        return new Travel(this.destino, this.validoAte, ip, userAgent, card);
     }
 
 }
