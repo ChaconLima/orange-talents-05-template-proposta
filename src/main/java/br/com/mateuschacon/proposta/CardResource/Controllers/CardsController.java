@@ -176,23 +176,27 @@ public class CardsController {
      * 
      * 
      */
-    @PostMapping(value="/{id}/paypal")
-    public ResponseEntity<?> digitalWalletPayPalRegistration(
+    @PostMapping(value="/{id}/{wallet}")
+    public ResponseEntity<?> digitalWalletRegistration(
 
         @PathVariable("id") String id_card,
+        @PathVariable("wallet") String wallet,
         @RequestBody @Valid NewDigitalWalletRequest newDigitalWalletPaypalRequest,
         UriComponentsBuilder uriBuilder
     
     ) throws URISyntaxException{
         
+        DigitalWalletEnum digitalWalletEnum =
+            DigitalWalletEnum.getDigitalWalletEnumByValue(wallet);
+
         Optional<Card> cardIsValid = this.cardRepository.findById(id_card);
 
-        if( !cardIsValid.isPresent() ){
+        if( !cardIsValid.isPresent() ||  digitalWalletEnum == null ){
             return ResponseEntity.notFound().build();
         }
 
         Card card = cardIsValid.get();
-        if(!card.isNotAssociated(DigitalWalletEnum.PAYPAL)){
+        if(!card.isNotAssociated(digitalWalletEnum)){
             return ResponseEntity.status( HttpStatus.UNPROCESSABLE_ENTITY).build();
         }
 
@@ -202,7 +206,7 @@ public class CardsController {
             fResponse =  
                 this.resouceCartaoFeing.digitalWallet(
                     id_card, 
-                    newDigitalWalletPaypalRequest.toRequest(DigitalWalletEnum.PAYPAL)    
+                    newDigitalWalletPaypalRequest.toRequest(digitalWalletEnum)    
                 );
 
         }catch(ResouceCartaoException e) {
@@ -213,7 +217,7 @@ public class CardsController {
         DigitalWallet digitalWallet = 
             newDigitalWalletPaypalRequest.toModel(
                 fResponse.getId(),
-                DigitalWalletEnum.PAYPAL,
+                digitalWalletEnum,
                 card
             );
 
@@ -222,7 +226,7 @@ public class CardsController {
         this.cardRepository.save(card);
 
 
-        URI uri = uriBuilder.path("/api/card/paypal/{id}").buildAndExpand(digitalWallet.getId()).toUri();
+        URI uri = uriBuilder.path("/api/card/{wallet}/{id}").buildAndExpand(wallet,digitalWallet.getId()).toUri();
         return ResponseEntity.created(uri).build(); 
     }
     
