@@ -18,13 +18,17 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.mateuschacon.proposta.CardResource.Dtos.BlockRequest;
 import br.com.mateuschacon.proposta.CardResource.Dtos.BlockResponse;
+import br.com.mateuschacon.proposta.CardResource.Dtos.DigitalWalletResponse;
 import br.com.mateuschacon.proposta.CardResource.Dtos.NewBiometryRequest;
+import br.com.mateuschacon.proposta.CardResource.Dtos.NewDigitalWalletRequest;
 import br.com.mateuschacon.proposta.CardResource.Dtos.NewTravelNoticeRequest;
 import br.com.mateuschacon.proposta.CardResource.Dtos.TravelNoticeResponse;
 import br.com.mateuschacon.proposta.CardResource.Models.Biometry;
 import br.com.mateuschacon.proposta.CardResource.Models.Block;
 import br.com.mateuschacon.proposta.CardResource.Models.Card;
+import br.com.mateuschacon.proposta.CardResource.Models.DigitalWallet;
 import br.com.mateuschacon.proposta.CardResource.Models.Travel;
+import br.com.mateuschacon.proposta.CardResource.Models.Enums.DigitalWalletEnum;
 import br.com.mateuschacon.proposta.CardResource.Repositorys.CardRepository;
 import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.ResouceCartaoException;
 import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.ResouceCartaoFeing;
@@ -167,6 +171,61 @@ public class CardsController {
 
      
     }
+    
+    /**
+     * 
+     * 
+     */
+    @PostMapping(value="/{id}/paypal")
+    public ResponseEntity<?> digitalWalletPayPalRegistration(
+
+        @PathVariable("id") String id_card,
+        @RequestBody @Valid NewDigitalWalletRequest newDigitalWalletPaypalRequest,
+        UriComponentsBuilder uriBuilder
+    
+    ) throws URISyntaxException{
+        
+        Optional<Card> cardIsValid = this.cardRepository.findById(id_card);
+
+        if( !cardIsValid.isPresent() ){
+            return ResponseEntity.notFound().build();
+        }
+
+        Card card = cardIsValid.get();
+        if(!card.isNotAssociated(DigitalWalletEnum.PAYPAL)){
+            return ResponseEntity.status( HttpStatus.UNPROCESSABLE_ENTITY).build();
+        }
+
+        DigitalWalletResponse fResponse;
+        try {
+
+            fResponse =  
+                this.resouceCartaoFeing.digitalWallet(
+                    id_card, 
+                    newDigitalWalletPaypalRequest.toRequest(DigitalWalletEnum.PAYPAL)    
+                );
+
+        }catch(ResouceCartaoException e) {
+            fResponse = e.getDigitalWalletResponse();
+            return ResponseEntity.status( HttpStatus.UNPROCESSABLE_ENTITY).build();
+        }
+
+        DigitalWallet digitalWallet = 
+            newDigitalWalletPaypalRequest.toModel(
+                fResponse.getId(),
+                DigitalWalletEnum.PAYPAL,
+                card
+            );
+
+        card.addDigitalWallet(digitalWallet);
+
+        this.cardRepository.save(card);
+
+
+        URI uri = uriBuilder.path("/api/card/paypal/{id}").buildAndExpand(digitalWallet.getId()).toUri();
+        return ResponseEntity.created(uri).build(); 
+    }
+    
     
     
 }

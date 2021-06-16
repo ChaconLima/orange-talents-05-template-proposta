@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import br.com.mateuschacon.proposta.CardResource.Dtos.BlockRequest;
 import br.com.mateuschacon.proposta.CardResource.Dtos.BlockResponse;
+import br.com.mateuschacon.proposta.CardResource.Dtos.DigitalWalletRequest;
+import br.com.mateuschacon.proposta.CardResource.Dtos.DigitalWalletResponse;
 import br.com.mateuschacon.proposta.CardResource.Dtos.NewTravelNoticeRequest;
 import br.com.mateuschacon.proposta.CardResource.Dtos.TravelNoticeResponse;
 import br.com.mateuschacon.proposta.ProposedResource.Dtos.CardAssociationResponse;
@@ -32,6 +34,14 @@ public interface ResouceCartaoFeing {
 
         @PathVariable("id") String id_proposed,
         @RequestBody NewTravelNoticeRequest entity
+        
+    );
+
+    @PostMapping(value = "cartoes/{id}/carteiras")
+    DigitalWalletResponse digitalWallet(
+
+        @PathVariable("id") String id_proposed,
+        @RequestBody DigitalWalletRequest entity
         
     );
     

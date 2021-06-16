@@ -17,6 +17,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import br.com.mateuschacon.proposta.CardResource.Dtos.TravelNoticeResponse;
+import br.com.mateuschacon.proposta.CardResource.Models.Enums.DigitalWalletEnum;
 
 @Entity
 public class Card {
@@ -41,6 +42,9 @@ public class Card {
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.MERGE)
     private Set<Travel> travels;
+
+    @OneToMany(mappedBy = "card", cascade = CascadeType.MERGE)
+    private Set<DigitalWallet> digitalWallets;
 
     @Deprecated
     public Card(){}
@@ -68,6 +72,17 @@ public class Card {
         return false;
     }
 
+    public boolean isNotAssociated(DigitalWalletEnum digitalWalletEnum) {
+        
+        for (DigitalWallet digitalWallet :  this.digitalWallets) {
+            if(digitalWallet.getDigitalWalletEnum().equals(digitalWalletEnum)){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public void addBiometry( Biometry biometry){
         this.biometrics.add(biometry);
     }
@@ -77,6 +92,10 @@ public class Card {
     public void addBlock(Block block){
         this.block = block;
     }
+    public void addDigitalWallet(DigitalWallet digitalWallet) {
+        this.digitalWallets.add(digitalWallet);
+    }
+
     public Set<Biometry> getBiometrics() {
         return this.biometrics;
     }
