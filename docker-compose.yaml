@@ -166,6 +166,10 @@ services:
       CONTAINER_DATABASE_URL: "jdbc:mysql://mysql:3306/container_proposta?allowPublicKeyRetrieval=true&useSSL=false"
       CONTAINER_DATABASE_USERNAME: "user_proposta"
       CONTAINER_DATABASE_PASSWORD: "proposta123mysql"
+      JAEGER_ENABLED: "true"
+      JAEGER_NAME: "proposta_docker"
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      JAEGER_SAMPLER: "1"
   
     depends_on: 
       - analise

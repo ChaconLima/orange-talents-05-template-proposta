@@ -7,7 +7,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +32,8 @@ import br.com.mateuschacon.proposta.CardResource.Models.Enums.DigitalWalletEnum;
 import br.com.mateuschacon.proposta.CardResource.Repositorys.CardRepository;
 import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.ResouceCartaoException;
 import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.ResouceCartaoFeing;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,8 +43,35 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequestMapping(value = "/api/card")
 public class CardsController {
 
-    @Autowired
-    CardRepository cardRepository;
+     /**
+     * Repository
+     */
+    private final CardRepository cardRepository;
+     /**
+     * HttpServletRequest.
+     */
+    private final HttpServletRequest request;
+    /**
+     * Feign.
+     */
+    private final ResouceCartaoFeing resouceCartaoFeing;
+    /**
+     * OpenTracing
+     */
+    private final Tracer tracer;
+
+    public CardsController(
+        CardRepository cardRepository, 
+        HttpServletRequest request,
+        ResouceCartaoFeing resouceCartaoFeing,
+        Tracer tracer
+    ) {
+        this.cardRepository = cardRepository;
+        this.request = request;
+        this.resouceCartaoFeing = resouceCartaoFeing;
+        this.tracer = tracer;
+    }
+
 
     @PostMapping(value="/{id}/biometry")
     public ResponseEntity<?> biometryRegistration(
@@ -53,6 +82,12 @@ public class CardsController {
     
     ) throws URISyntaxException{
         
+        /**
+         * OpenTracing
+         */
+        Span activeSpan = tracer.activeSpan();
+        activeSpan.setTag("card.biometry.id",id_card);
+
         Optional<Card> cardIsValid = this.cardRepository.findById(id_card);
 
         if(cardIsValid.isPresent()){
@@ -71,18 +106,6 @@ public class CardsController {
         return ResponseEntity.notFound().build();
     }
 
-    /**
-     * HttpServletRequest.
-     */
-    @Autowired
-    private HttpServletRequest request;
-
-    /**
-     * Feign.
-     */
-    @Autowired
-    private ResouceCartaoFeing resouceCartaoFeing;
-
     @GetMapping(value="/{id}/block")
     public ResponseEntity<?> blockRegistration(
 
@@ -90,7 +113,12 @@ public class CardsController {
         UriComponentsBuilder uriBuilder
     
     ) throws URISyntaxException{
-        
+        /**
+         * OpenTracing
+         */
+        Span activeSpan = tracer.activeSpan();
+        activeSpan.setTag("card.block.id",id_card);
+
         Optional<Card> cardIsValid = this.cardRepository.findById(id_card);
 
         if(!cardIsValid.isPresent()){
@@ -109,7 +137,10 @@ public class CardsController {
                 blockResponse = this.resouceCartaoFeing.blockCard( id_card, new BlockRequest("Sistema de Proposta"));
         
             }catch(ResouceCartaoException e) {
-                
+                /**
+                 * OpenTracing
+                 */
+                activeSpan.log(e.getMessage());
                 blockResponse = e.getBlockResponse();
             }
 
@@ -138,6 +169,11 @@ public class CardsController {
         @RequestBody @Valid NewTravelNoticeRequest newTravelNoticeRequest
 
     ){
+        /**
+         * OpenTracing
+         */
+        Span activeSpan = tracer.activeSpan();
+        activeSpan.setTag("card.travel.id",id_card);
 
         Optional<Card> cardIsValid = this.cardRepository.findById(id_card);
 
@@ -151,7 +187,10 @@ public class CardsController {
             fResponse =  this.resouceCartaoFeing.travelNotice(id_card, newTravelNoticeRequest);
     
         }catch(ResouceCartaoException e) {
-
+            /**
+             * OpenTracing
+             */
+            activeSpan.log(e.getMessage());
             fResponse = e.getTravelNoticeResponse();
 
         }
@@ -185,7 +224,12 @@ public class CardsController {
         UriComponentsBuilder uriBuilder
     
     ) throws URISyntaxException{
-        
+        /**
+         * OpenTracing
+         */
+        Span activeSpan = tracer.activeSpan();
+        activeSpan.setTag("card."+wallet+".id",id_card);
+
         DigitalWalletEnum digitalWalletEnum =
             DigitalWalletEnum.getDigitalWalletEnumByValue(wallet);
 
@@ -210,6 +254,10 @@ public class CardsController {
                 );
 
         }catch(ResouceCartaoException e) {
+            /**
+             * OpenTracing
+             */
+            activeSpan.log(e.getMessage());
             fResponse = e.getDigitalWalletResponse();
             return ResponseEntity.status( HttpStatus.UNPROCESSABLE_ENTITY).build();
         }
