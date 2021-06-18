@@ -18,6 +18,7 @@ import javax.validation.constraints.NotNull;
 
 import br.com.mateuschacon.proposta.CardResource.Dtos.TravelNoticeResponse;
 import br.com.mateuschacon.proposta.CardResource.Models.Enums.DigitalWalletEnum;
+import br.com.mateuschacon.proposta.Configuration.Cryptography.MD5;
 
 @Entity
 public class Card {
@@ -50,7 +51,10 @@ public class Card {
     public Card(){}
 
     public Card(@NotBlank String id, @NotNull LocalDateTime issued, @NotNull BigDecimal limitCard) {
-        this.id = id;
+
+        MD5 md5 = new MD5();
+
+        this.id = md5.md5(id);
         this.issued = issued;
         this.limitCard = limitCard;
         this.biometrics = new HashSet<>();

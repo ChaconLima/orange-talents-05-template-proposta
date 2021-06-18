@@ -30,6 +30,7 @@ import br.com.mateuschacon.proposta.CardResource.Models.DigitalWallet;
 import br.com.mateuschacon.proposta.CardResource.Models.Travel;
 import br.com.mateuschacon.proposta.CardResource.Models.Enums.DigitalWalletEnum;
 import br.com.mateuschacon.proposta.CardResource.Repositorys.CardRepository;
+import br.com.mateuschacon.proposta.Configuration.Cryptography.MD5;
 import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.ResouceCartaoException;
 import br.com.mateuschacon.proposta.Configuration.OpenFeign.Api_ResouceCartao.ResouceCartaoFeing;
 import io.opentracing.Span;
@@ -59,17 +60,23 @@ public class CardsController {
      * OpenTracing
      */
     private final Tracer tracer;
+    /**
+     * Cryptography
+     */
+    private final MD5 md5;
 
     public CardsController(
         CardRepository cardRepository, 
         HttpServletRequest request,
         ResouceCartaoFeing resouceCartaoFeing,
-        Tracer tracer
+        Tracer tracer,
+        MD5 md5
     ) {
         this.cardRepository = cardRepository;
         this.request = request;
         this.resouceCartaoFeing = resouceCartaoFeing;
         this.tracer = tracer;
+        this.md5 = md5;
     }
 
 
@@ -88,7 +95,7 @@ public class CardsController {
         Span activeSpan = tracer.activeSpan();
         activeSpan.setTag("card.biometry.id",id_card);
 
-        Optional<Card> cardIsValid = this.cardRepository.findById(id_card);
+        Optional<Card> cardIsValid = this.cardRepository.findById( this.md5.md5(id_card) );
 
         if(cardIsValid.isPresent()){
 
@@ -117,9 +124,9 @@ public class CardsController {
          * OpenTracing
          */
         Span activeSpan = tracer.activeSpan();
-        activeSpan.setTag("card.block.id",id_card);
+        activeSpan.setTag("card.block.id",this.md5.md5(id_card));
 
-        Optional<Card> cardIsValid = this.cardRepository.findById(id_card);
+        Optional<Card> cardIsValid = this.cardRepository.findById(this.md5.md5(id_card));
 
         if(!cardIsValid.isPresent()){
             return ResponseEntity.notFound().build();
@@ -173,9 +180,9 @@ public class CardsController {
          * OpenTracing
          */
         Span activeSpan = tracer.activeSpan();
-        activeSpan.setTag("card.travel.id",id_card);
+        activeSpan.setTag("card.travel.id",this.md5.md5(id_card));
 
-        Optional<Card> cardIsValid = this.cardRepository.findById(id_card);
+        Optional<Card> cardIsValid = this.cardRepository.findById(this.md5.md5(id_card));
 
         if( !cardIsValid.isPresent() ){
             return ResponseEntity.notFound().build();
@@ -223,17 +230,17 @@ public class CardsController {
         @RequestBody @Valid NewDigitalWalletRequest newDigitalWalletPaypalRequest,
         UriComponentsBuilder uriBuilder
     
-    ) throws URISyntaxException{
+    ) throws URISyntaxException{   
         /**
          * OpenTracing
          */
         Span activeSpan = tracer.activeSpan();
-        activeSpan.setTag("card."+wallet+".id",id_card);
+        activeSpan.setTag("card."+wallet+".id",this.md5.md5(id_card));
 
         DigitalWalletEnum digitalWalletEnum =
             DigitalWalletEnum.getDigitalWalletEnumByValue(wallet);
 
-        Optional<Card> cardIsValid = this.cardRepository.findById(id_card);
+        Optional<Card> cardIsValid = this.cardRepository.findById(this.md5.md5(id_card));
 
         if( !cardIsValid.isPresent() ||  digitalWalletEnum == null ){
             return ResponseEntity.notFound().build();
