@@ -109,8 +109,10 @@ services:
   prometheus:
     image: prom/prometheus
     volumes:
-      - prometheus-volume:/etc/prometheus/
+      - "./src/main/resources/prometheus.yml:/etc/prometheus/prometheus.yml" 
     network_mode: bridge
+    command: 
+      - "--config.file=/etc/prometheus/prometheus.yml"
     ports:
       - "9090:9090"
 
@@ -159,7 +161,7 @@ services:
     container_name: proposta
     environment:
       APP_PORT: "8821"
-      HOST_KEYCLOAK_CLIENT: "http://localhost:18080/auth/realms/proposta"
+      HOST_KEYCLOAK_CLIENT: "http://host.docker.internal:18080/auth/realms/proposta"
       HOST_KEYCLOAK_CERTIFICADO: "http://keycloak:8080/auth/realms/proposta/protocol/openid-connect/certs"
       HOST_API_ANALISE: "http://analise:9999/api"
       HOST_API_CONTAS: "http://contas:8888/api"
